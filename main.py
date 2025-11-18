@@ -8,23 +8,23 @@
 #     - Weryfikujące poprawność wyników dla prawidłowych danych wejściowych.
 # =============================================================================
 import numpy as np
+import scipy as sp
+import matplotlib.pyplot as plt
+
 
 
 def spare_matrix_Abt(m: int, n: int) -> tuple[np.ndarray, np.ndarray] | None:
-    """Funkcja tworząca zestaw składający się z macierzy A (m,n) i
-    wektora b (m,) na podstawie pomocniczego wektora t (m,).
+    if not isinstance(m, int) or not isinstance(n, int):
+        return None
+    if m <= 0 or n <= 0:
+        return None
 
-    Args:
-        m (int): Liczba wierszy macierzy A.
-        n (int): Liczba kolumn macierzy A.
+    t = np.linspace(0, 1, m)
+    A = np.vander(t, N=n, increasing=True)
+    
+    b = np.cos(4 * t)
 
-    Returns:
-        (tuple[np.ndarray, np.ndarray]):
-            - Macierz A o rozmiarze (m,n),
-            - Wektor b (m,).
-        Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
-    """
-    pass
+    return A, b
 
 
 def square_from_rectan(
@@ -44,7 +44,24 @@ def square_from_rectan(
             - Wektor b_new (n,).
         Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
     """
-    pass
+    if not isinstance(A, np.ndarray) or not isinstance(b, np.ndarray):
+        return None
+
+    # Walidacja wymiarów A i b
+    if A.ndim != 2 or b.ndim != 1:
+        return None
+
+    m, n = A.shape
+    if b.shape[0] != m:
+        return None
+
+    try:
+        A_new = A.T @ A
+        b_new = A.T @ b
+    except Exception:
+        return None
+
+    return A_new, b_new
 
 
 def residual_norm(A: np.ndarray, x: np.ndarray, b: np.ndarray) -> float | None:
@@ -60,4 +77,20 @@ def residual_norm(A: np.ndarray, x: np.ndarray, b: np.ndarray) -> float | None:
         (float): Wartość normy residuum dla podanych parametrów.
         Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
     """
-    pass
+    if not isinstance(A, np.ndarray) or not isinstance(x, np.ndarray) or not isinstance(b, np.ndarray):
+        return None
+
+    # Walidacja wymiarów
+    if A.ndim != 2 or x.ndim != 1 or b.ndim != 1:
+        return None
+
+    m, n = A.shape
+    if x.shape[0] != n or b.shape[0] != m:
+        return None
+
+    try:
+        r = A @ x - b
+        return float(np.linalg.norm(r))
+    except Exception:
+        return None
+    
